@@ -7,6 +7,9 @@ import com.ecommerce.domain.OrderItem;
 import com.ecommerce.domain.Product;
 import com.ecommerce.domain.User;
 import com.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.exception.BadRequestException;
+import com.ecommerce.exception.InsufficientStockException;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CartItemRepository;
 import com.ecommerce.repository.OrderItemRepository;
 import com.ecommerce.repository.OrderRepository;
@@ -34,11 +37,11 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Order placeOrder(Long userId, PlaceOrderRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
         if (cartItems.isEmpty()) {
-            throw new IllegalArgumentException("Cart is empty");
+            throw new BadRequestException("Cart is empty");
         }
 
         BigDecimal totalAmount = BigDecimal.ZERO;
@@ -57,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
         for (CartItem cartItem : cartItems) {
             Product product = cartItem.getProduct();
             if (product.getStock() < cartItem.getQuantity()) {
-                throw new IllegalArgumentException("Insufficient stock for product: " + product.getName());
+                throw new InsufficientStockException(product.getName(), product.getStock(), cartItem.getQuantity());
             }
             product.setStock(product.getStock() - cartItem.getQuantity());
             productRepository.save(product);
@@ -88,14 +91,14 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> getOrdersByUser(Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
         return orderRepository.findByUserId(userId);
     }
 
     @Override
     public Order getOrderById(Long id) {
         return orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", id));
     }
 
     @Override
@@ -105,3 +108,4 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order);
     }
 }
+

@@ -2,6 +2,7 @@ package com.ecommerce.service.impl;
 
 import com.ecommerce.domain.Category;
 import com.ecommerce.dto.CreateCategoryRequest;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.service.CategoryService;
 import jakarta.transaction.Transactional;
@@ -36,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category getById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", id));
     }
 
     @Override

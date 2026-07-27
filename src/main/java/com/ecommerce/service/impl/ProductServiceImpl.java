@@ -3,6 +3,8 @@ package com.ecommerce.service.impl;
 import com.ecommerce.domain.Category;
 import com.ecommerce.domain.Product;
 import com.ecommerce.dto.CreateProductRequest;
+import com.ecommerce.exception.InsufficientStockException;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.service.ProductService;
@@ -21,14 +23,9 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<Product> getAll() {
-        return productRepository.findAll();
-    }
-
-    @Override
     public Product create(CreateProductRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + request.getCategoryId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -47,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Product getById(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id));
     }
 
     @Override
@@ -71,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
         
         if (request.getCategoryId() != null && !request.getCategoryId().equals(product.getCategory().getId())) {
             Category category = categoryRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + request.getCategoryId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
             product.setCategory(category);
         }
 
@@ -98,9 +95,10 @@ public class ProductServiceImpl implements ProductService {
         Product product = getById(id);
         int newStock = product.getStock() + quantity;
         if (newStock < 0) {
-            throw new IllegalArgumentException("Insufficient stock");
+            throw new InsufficientStockException(product.getName(), product.getStock(), -quantity);
         }
         product.setStock(newStock);
         return productRepository.save(product);
     }
 }
+

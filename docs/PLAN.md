@@ -8,7 +8,7 @@ Egyetlen Spring Boot alkalmazás, minden funkció egyben.
 - [X] 1.3 Service layer — üzleti logika (regisztráció/login, termék CRUD, kosárkezelés, rendelés leadás)
 - [X] 1.4 Controller layer — REST API végpontok
 - [X] 1.5 DTO — kérés/válasz objektumok
-- [ ] 1.6 Exception handling — `@ControllerAdvice` globális hibakezelés
+- [X] 1.6 Exception handling — `@ControllerAdvice` globális hibakezelés
 - [ ] 1.7 Security — Spring Security + JWT autentikáció
 - [ ] 1.8 Tesztek — repository/service unit tesztek
 

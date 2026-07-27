@@ -3,6 +3,8 @@ package com.ecommerce.service.impl;
 import com.ecommerce.domain.User;
 import com.ecommerce.dto.LoginRequest;
 import com.ecommerce.dto.RegisterRequest;
+import com.ecommerce.exception.BadRequestException;
+import com.ecommerce.exception.DuplicateResourceException;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.AuthService;
 import jakarta.transaction.Transactional;
@@ -21,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new IllegalArgumentException("User with this email already exists");
+            throw new DuplicateResourceException("User", "email", request.getEmail());
         }
 
         User user = User.builder()
@@ -38,17 +40,18 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new BadRequestException("Invalid email or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new BadRequestException("Invalid email or password");
         }
 
         if (!user.getActive()) {
-            throw new IllegalArgumentException("User account is inactive");
+            throw new BadRequestException("User account is inactive");
         }
 
         return user;
     }
 }
+
 

@@ -3,6 +3,8 @@ package com.ecommerce.service.impl;
 import com.ecommerce.domain.CartItem;
 import com.ecommerce.domain.Product;
 import com.ecommerce.domain.User;
+import com.ecommerce.exception.BadRequestException;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CartItemRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
@@ -26,21 +28,21 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartItem> getCart(Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
         return cartItemRepository.findByUserId(userId);
     }
 
     @Override
     public CartItem addItem(Long userId, Long productId, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
+            throw new BadRequestException("Quantity must be positive");
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product", productId));
 
         Optional<CartItem> existingItem = cartItemRepository.findByUserIdAndProductId(userId, productId);
 
@@ -61,11 +63,11 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartItem updateQuantity(Long cartItemId, int quantity) {
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be positive");
+            throw new BadRequestException("Quantity must be positive");
         }
 
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem", cartItemId));
 
         cartItem.setQuantity(quantity);
         return cartItemRepository.save(cartItem);
@@ -74,15 +76,16 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeItem(Long cartItemId) {
         CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart item not found with id: " + cartItemId));
+                .orElseThrow(() -> new ResourceNotFoundException("CartItem", cartItemId));
         cartItemRepository.delete(cartItem);
     }
 
     @Override
     public void clearCart(Long userId) {
         userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
         cartItemRepository.deleteAll(cartItems);
     }
 }
+

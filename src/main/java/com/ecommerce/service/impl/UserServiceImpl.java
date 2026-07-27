@@ -2,6 +2,7 @@ package com.ecommerce.service.impl;
 
 import com.ecommerce.domain.User;
 import com.ecommerce.dto.UpdateUserRequest;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.UserService;
 import jakarta.transaction.Transactional;
@@ -18,7 +19,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("User", id));
     }
 
     @Override

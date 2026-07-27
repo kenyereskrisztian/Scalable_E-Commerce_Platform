@@ -2,6 +2,7 @@ package com.ecommerce.service.impl;
 
 import com.ecommerce.dto.PaymentRequest;
 import com.ecommerce.dto.PaymentResult;
+import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.service.PaymentService;
 import jakarta.transaction.Transactional;
@@ -23,7 +24,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResult processPayment(Long orderId, PaymentRequest request) {
         // Validate order exists
         orderRepository.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found with id: " + orderId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
 
         // TODO: Implement actual payment processing with external payment gateway
         // This is a stub implementation for MVP
