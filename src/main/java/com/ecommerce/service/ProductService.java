@@ -6,8 +6,10 @@ import com.ecommerce.dto.CreateProductRequest;
 import java.util.List;
 
 public interface ProductService {
+    List<Product> getAll();
     Product create(CreateProductRequest request);
     Product getById(Long id);
+    List<Product> getAll();
     List<Product> getAllByCategory(Long categoryId);
     List<Product> searchByName(String name);
     Product update(Long id, CreateProductRequest request);

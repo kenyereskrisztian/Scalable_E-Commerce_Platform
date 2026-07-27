@@ -21,6 +21,11 @@ public class ProductServiceImpl implements ProductService {
     private final CategoryRepository categoryRepository;
 
     @Override
+    public List<Product> getAll() {
+        return productRepository.findAll();
+    }
+
+    @Override
     public Product create(CreateProductRequest request) {
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found with id: " + request.getCategoryId()));
@@ -43,6 +48,11 @@ public class ProductServiceImpl implements ProductService {
     public Product getById(Long id) {
         return productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+    }
+
+    @Override
+    public List<Product> getAll() {
+        return productRepository.findAll();
     }
 
     @Override
