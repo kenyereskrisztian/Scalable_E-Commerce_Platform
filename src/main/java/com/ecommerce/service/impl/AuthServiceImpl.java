@@ -1,11 +1,13 @@
 package com.ecommerce.service.impl;
 
 import com.ecommerce.domain.User;
+import com.ecommerce.dto.AuthResponse;
 import com.ecommerce.dto.LoginRequest;
 import com.ecommerce.dto.RegisterRequest;
 import com.ecommerce.exception.BadRequestException;
 import com.ecommerce.exception.DuplicateResourceException;
 import com.ecommerce.repository.UserRepository;
+import com.ecommerce.security.JwtUtil;
 import com.ecommerce.service.AuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,10 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Override
-    public User register(RegisterRequest request) {
+    public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new DuplicateResourceException("User", "email", request.getEmail());
         }
@@ -34,11 +37,19 @@ public class AuthServiceImpl implements AuthService {
                 .active(true)
                 .build();
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return AuthResponse.builder()
+                .token(token)
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .build();
     }
 
     @Override
-    public User login(LoginRequest request) {
+    public AuthResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid email or password"));
 
@@ -50,7 +61,14 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException("User account is inactive");
         }
 
-        return user;
+        String token = jwtUtil.generateToken(user.getEmail());
+
+        return AuthResponse.builder()
+                .token(token)
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .build();
     }
 }
 
