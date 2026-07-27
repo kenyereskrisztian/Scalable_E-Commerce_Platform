@@ -10,7 +10,7 @@ Egyetlen Spring Boot alkalmazás, minden funkció egyben.
 - [X] 1.5 DTO — kérés/válasz objektumok
 - [X] 1.6 Exception handling — `@ControllerAdvice` globális hibakezelés
 - [X] 1.7 Security — Spring Security + JWT autentikáció
-- [ ] 1.8 Tesztek — repository/service unit tesztek
+- [X] 1.8 Tesztek — repository/service/controller unit tesztek H2 + Mockito
 
 **Eredmény:** Működő REST API, Postmannal tesztelhető.
 
