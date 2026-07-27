@@ -4,7 +4,7 @@
 Egyetlen Spring Boot alkalmazás, minden funkció egyben.
 
 - [X] 1.1 Model layer — `User`, `Product`, `Category`, `CartItem`, `Order`, `OrderItem` entitások JPA-val
-- [ ] 1.2 Repository layer — Spring Data JPA repository-k
+- [X] 1.2 Repository layer — Spring Data JPA repository-k
 - [ ] 1.3 Service layer — üzleti logika (regisztráció/login JWT-vel, termék CRUD, kosárkezelés, rendelés leadás)
 - [ ] 1.4 Controller layer — REST API végpontok
 - [ ] 1.5 DTO + mapper — kérés/válasz objektumok, mapping
