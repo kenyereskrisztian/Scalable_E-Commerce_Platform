@@ -6,7 +6,7 @@ import com.ecommerce.domain.Order.OrderStatus;
 import com.ecommerce.domain.OrderItem;
 import com.ecommerce.domain.Product;
 import com.ecommerce.domain.User;
-import com.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.dto.incoming.PlaceOrderRequest;
 import com.ecommerce.exception.BadRequestException;
 import com.ecommerce.exception.InsufficientStockException;
 import com.ecommerce.exception.ResourceNotFoundException;

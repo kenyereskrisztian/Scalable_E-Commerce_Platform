@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.domain.User;
-import com.ecommerce.dto.UpdateUserRequest;
+import com.ecommerce.dto.incoming.UpdateUserRequest;
 import com.ecommerce.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.domain.Category;
-import com.ecommerce.dto.CreateCategoryRequest;
+import com.ecommerce.dto.incoming.CreateCategoryRequest;
 import com.ecommerce.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

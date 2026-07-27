@@ -2,7 +2,7 @@ package com.ecommerce.controller;
 
 import com.ecommerce.domain.Order;
 import com.ecommerce.domain.Order.OrderStatus;
-import com.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.dto.incoming.PlaceOrderRequest;
 import com.ecommerce.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

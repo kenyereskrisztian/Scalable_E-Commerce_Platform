@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.domain.Product;
-import com.ecommerce.dto.CreateProductRequest;
+import com.ecommerce.dto.incoming.CreateProductRequest;
 import com.ecommerce.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

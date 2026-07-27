@@ -1,7 +1,7 @@
 package com.ecommerce.service;
 
 import com.ecommerce.domain.Product;
-import com.ecommerce.dto.CreateProductRequest;
+import com.ecommerce.dto.incoming.CreateProductRequest;
 
 import java.util.List;
 

@@ -1,7 +1,7 @@
 package com.ecommerce.service;
 
 import com.ecommerce.domain.Category;
-import com.ecommerce.dto.CreateCategoryRequest;
+import com.ecommerce.dto.incoming.CreateCategoryRequest;
 
 import java.util.List;
 

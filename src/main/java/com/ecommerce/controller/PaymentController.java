@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.PaymentRequest;
-import com.ecommerce.dto.PaymentResult;
+import com.ecommerce.dto.incoming.PaymentRequest;
+import com.ecommerce.dto.outgoing.PaymentResult;
 import com.ecommerce.service.PaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

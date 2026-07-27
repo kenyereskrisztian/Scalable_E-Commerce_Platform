@@ -1,7 +1,7 @@
 package com.ecommerce.service.impl;
 
 import com.ecommerce.domain.User;
-import com.ecommerce.dto.UpdateUserRequest;
+import com.ecommerce.dto.incoming.UpdateUserRequest;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.service.UserService;

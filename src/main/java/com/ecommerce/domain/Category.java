@@ -1,8 +1,10 @@
 package com.ecommerce.domain;
 
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "categories")
 @Getter
 @Setter

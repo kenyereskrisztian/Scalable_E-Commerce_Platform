@@ -1,7 +1,7 @@
 package com.ecommerce.service.impl;
 
 import com.ecommerce.domain.Category;
-import com.ecommerce.dto.CreateCategoryRequest;
+import com.ecommerce.dto.incoming.CreateCategoryRequest;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.service.CategoryService;

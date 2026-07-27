@@ -2,7 +2,7 @@ package com.ecommerce.service.impl;
 
 import com.ecommerce.domain.Category;
 import com.ecommerce.domain.Product;
-import com.ecommerce.dto.CreateProductRequest;
+import com.ecommerce.dto.incoming.CreateProductRequest;
 import com.ecommerce.exception.InsufficientStockException;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.CategoryRepository;

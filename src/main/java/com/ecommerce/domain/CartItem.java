@@ -1,13 +1,16 @@
 package com.ecommerce.domain;
 
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Table(name = "cart_items", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"user_id", "product_id"}, name = "uk_cart_user_product")
 })

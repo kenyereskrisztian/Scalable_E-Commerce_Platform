@@ -1,9 +1,9 @@
 package com.ecommerce.test.controller;
 
 import com.ecommerce.controller.AuthController;
-import com.ecommerce.dto.AuthResponse;
-import com.ecommerce.dto.LoginRequest;
-import com.ecommerce.dto.RegisterRequest;
+import com.ecommerce.dto.outgoing.AuthResponse;
+import com.ecommerce.dto.incoming.LoginRequest;
+import com.ecommerce.dto.incoming.RegisterRequest;
 import com.ecommerce.exception.BadRequestException;
 import com.ecommerce.service.AuthService;
 import com.fasterxml.jackson.databind.ObjectMapper;

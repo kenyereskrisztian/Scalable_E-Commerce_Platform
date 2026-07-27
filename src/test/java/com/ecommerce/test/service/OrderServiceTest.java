@@ -1,7 +1,7 @@
 package com.ecommerce.test.service;
 
 import com.ecommerce.domain.*;
-import com.ecommerce.dto.PlaceOrderRequest;
+import com.ecommerce.dto.incoming.PlaceOrderRequest;
 import com.ecommerce.exception.BadRequestException;
 import com.ecommerce.exception.InsufficientStockException;
 import com.ecommerce.repository.CartItemRepository;

@@ -1,7 +1,7 @@
 package com.ecommerce.service.impl;
 
-import com.ecommerce.dto.PaymentRequest;
-import com.ecommerce.dto.PaymentResult;
+import com.ecommerce.dto.incoming.PaymentRequest;
+import com.ecommerce.dto.outgoing.PaymentResult;
 import com.ecommerce.exception.ResourceNotFoundException;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.service.PaymentService;
