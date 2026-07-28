@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: product-service
+
+server:
+  port: 8082
+
+spring.datasource:
+  url: jdbc:mysql://localhost:3306/ecommerce_products?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+  username: root
+  password: test1234
+  driver-class-name: com.mysql.cj.jdbc.Driver
+
+spring.jpa:
+  hibernate:
+    ddl-auto: update
+  show-sql: true
+  properties:
+    hibernate:
+      format_sql: true
+
+app:
+  jwt:
+    secret: "NOvxdE/9L4Mn4dKRSzIcGNnHjf3gdtdTopmti0n7Dy4="
+    expiration: 86400000

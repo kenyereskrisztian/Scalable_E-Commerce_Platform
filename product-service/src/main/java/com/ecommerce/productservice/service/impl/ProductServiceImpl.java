@@ -1,0 +1,103 @@
+package com.ecommerce.productservice.service.impl;
+
+import com.ecommerce.common.exception.InsufficientStockException;
+import com.ecommerce.common.exception.ResourceNotFoundException;
+import com.ecommerce.productservice.domain.Category;
+import com.ecommerce.productservice.domain.Product;
+import com.ecommerce.productservice.dto.CreateProductRequest;
+import com.ecommerce.productservice.repository.CategoryRepository;
+import com.ecommerce.productservice.repository.ProductRepository;
+import com.ecommerce.productservice.service.ProductService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+
+    @Override
+    public Product create(CreateProductRequest request) {
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
+
+        Product product = Product.builder()
+                .name(request.getName())
+                .description(request.getDescription())
+                .price(request.getPrice())
+                .stock(request.getStock() != null ? request.getStock() : 0)
+                .imageUrl(request.getImageUrl())
+                .sku(request.getSku())
+                .manufacturer(request.getManufacturer())
+                .category(category)
+                .active(true)
+                .build();
+        return productRepository.save(product);
+    }
+
+    @Override
+    public Product getById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product", id));
+    }
+
+    @Override
+    public List<Product> getAll() {
+        return productRepository.findAll();
+    }
+
+    @Override
+    public List<Product> getAllByCategory(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<Product> searchByName(String name) {
+        return productRepository.findByNameContainingIgnoreCase(name);
+    }
+
+    @Override
+    public Product update(Long id, CreateProductRequest request) {
+        Product product = getById(id);
+
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(product.getCategory().getId())) {
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", request.getCategoryId()));
+            product.setCategory(category);
+        }
+
+        if (request.getName() != null) product.setName(request.getName());
+        if (request.getDescription() != null) product.setDescription(request.getDescription());
+        if (request.getPrice() != null) product.setPrice(request.getPrice());
+        if (request.getStock() != null) product.setStock(request.getStock());
+        if (request.getImageUrl() != null) product.setImageUrl(request.getImageUrl());
+        if (request.getSku() != null) product.setSku(request.getSku());
+        if (request.getManufacturer() != null) product.setManufacturer(request.getManufacturer());
+
+        return productRepository.save(product);
+    }
+
+    @Override
+    public void delete(Long id) {
+        Product product = getById(id);
+        product.setActive(false);
+        productRepository.save(product);
+    }
+
+    @Override
+    public Product updateStock(Long id, int quantity) {
+        Product product = getById(id);
+        int newStock = product.getStock() + quantity;
+        if (newStock < 0) {
+            throw new InsufficientStockException(product.getName(), product.getStock(), -quantity);
+        }
+        product.setStock(newStock);
+        return productRepository.save(product);
+    }
+}

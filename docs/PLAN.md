@@ -19,15 +19,17 @@ Egyetlen Spring Boot alkalmazás, minden funkció egyben.
 ## Phase 2 — Multi-Module Microservices
 Monolit szétbontása független Maven modulokra.
 
-- [ ] 2.1 Parent POM átalakítása multi-module-ra
-- [ ] 2.2 `common` modul — shared DTO-k, util-ok
-- [ ] 2.3 `user-service` kiemelése (port: 8081)
-- [ ] 2.4 `product-service` kiemelése (port: 8082)
-- [ ] 2.5 `cart-service` kiemelése (port: 8083)
-- [ ] 2.6 `order-service` kiemelése (port: 8084)
-- [ ] 2.7 `payment-service` kiemelése (port: 8085)
-- [ ] 2.8 `notification-service` kiemelése (port: 8086)
-- [ ] 2.9 Szolgáltatások közötti REST kommunikáció (WebClient vagy OpenFeign)
+- [X] 2.1 Parent POM átalakítása multi-module-ra
+- [X] 2.2 `common` modul — shared DTO-k, util-ok
+- [X] 2.3 `user-service` kiemelése (port: 8081)
+- [X] 2.4 `product-service` kiemelése (port: 8082)
+- [X] 2.5 `cart-service` kiemelése (port: 8083)
+- [X] 2.6 `order-service` kiemelése (port: 8084)
+- [X] 2.7 `payment-service` kiemelése (port: 8085)
+- [X] 2.8 `notification-service` kiemelése (port: 8086)
+- [X] 2.9 Szolgáltatások közötti REST kommunikáció (WebClient)
+
+**Eredmény:** 6 külön Spring Boot alkalmazás, egymást REST-en hívják.
 
 **Eredmény:** 6 külön Spring Boot alkalmazás, egymást REST-en hívják.
 

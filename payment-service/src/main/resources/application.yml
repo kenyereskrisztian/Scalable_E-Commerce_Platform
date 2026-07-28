@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: payment-service
+
+server:
+  port: 8085
+
+app:
+  jwt:
+    secret: "NOvxdE/9L4Mn4dKRSzIcGNnHjf3gdtdTopmti0n7Dy4="
+    expiration: 86400000
