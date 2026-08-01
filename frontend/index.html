@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Platform — Tesztfelület</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <span class="brand-logo">EC</span>
+        <div>
+            <h1>E-Commerce Platform</h1>
+            <p class="brand-sub">Mikroszolgáltatás tesztfelület</p>
+        </div>
+    </div>
+    <div class="status-dots" id="serviceStatus" title="Szolgáltatások állapota">
+        <span class="status-dot" data-svc="user"><i></i>User</span>
+        <span class="status-dot" data-svc="product"><i></i>Termék</span>
+        <span class="status-dot" data-svc="cart"><i></i>Kosár</span>
+        <span class="status-dot" data-svc="order"><i></i>Rendelés</span>
+        <span class="status-dot" data-svc="payment"><i></i>Fizetés</span>
+        <span class="status-dot" data-svc="notification"><i></i>Értesítés</span>
+    </div>
+    <div class="user-chip" id="userChip">
+        <span class="chip-guest">Nincs bejelentkezve</span>
+        <button class="btn btn-ghost btn-sm hidden" id="logoutBtn">Kijelentkezés</button>
+    </div>
+</header>
+
+<nav class="tabs">
+    <button class="tab-btn active" data-tab="auth">Fiók</button>
+    <button class="tab-btn" data-tab="products">Termékek</button>
+    <button class="tab-btn" data-tab="categories">Kategóriák</button>
+    <button class="tab-btn" data-tab="cart">Kosár</button>
+    <button class="tab-btn" data-tab="orders">Rendelések</button>
+    <button class="tab-btn" data-tab="payment">Fizetés</button>
+    <button class="tab-btn" data-tab="notifications">Értesítések</button>
+</nav>
+
+<main class="content">
+
+    <!-- ============ FIÓK ============ -->
+    <section id="tab-auth" class="view active">
+        <div class="grid-2">
+            <div class="card">
+                <h2>Bejelentkezés</h2>
+                <p class="muted">Demo: <code>demo1@shop.hu</code> / <code>password123</code></p>
+                <form id="loginForm">
+                    <label>Email
+                        <input type="email" name="email" autocomplete="username" required>
+                    </label>
+                    <label>Jelszó
+                        <input type="password" name="password" autocomplete="current-password" required>
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-block">Bejelentkezés</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>Regisztráció</h2>
+                <form id="registerForm">
+                    <div class="grid-2">
+                        <label>Vezetéknév
+                            <input type="text" name="firstName" required>
+                        </label>
+                        <label>Keresztnév
+                            <input type="text" name="lastName" required>
+                        </label>
+                    </div>
+                    <label>Email
+                        <input type="email" name="email" required>
+                    </label>
+                    <label>Jelszó
+                        <input type="password" name="password" required>
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-block">Regisztráció</button>
+                </form>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Bejelentkezett felhasználó</h2>
+            <pre id="authInfo" class="pre-box">Nem jelentkezett még be.</pre>
+        </div>
+    </section>
+
+    <!-- ============ TERMÉKEK ============ -->
+    <section id="tab-products" class="view">
+        <div class="card">
+            <div class="toolbar">
+                <select id="productCategoryFilter" class="input">
+                    <option value="">Minden kategória</option>
+                </select>
+                <input id="productSearch" class="input" type="text" placeholder="Keresés név alapján...">
+                <button class="btn btn-primary" id="productSearchBtn">Keresés</button>
+                <button class="btn btn-ghost" id="productRefreshBtn">Frissítés</button>
+            </div>
+        </div>
+        <div id="productGrid" class="product-grid"></div>
+    </section>
+
+    <!-- ============ KATEGÓRIÁK ============ -->
+    <section id="tab-categories" class="view">
+        <div class="grid-2">
+            <div class="card">
+                <h2>Új kategória</h2>
+                <form id="categoryForm">
+                    <label>Név
+                        <input type="text" name="name" required>
+                    </label>
+                    <label>Leírás
+                        <textarea name="description" rows="3"></textarea>
+                    </label>
+                    <label>Kép URL
+                        <input type="url" name="imageUrl" placeholder="https://picsum.photos/...">
+                    </label>
+                    <button type="submit" class="btn btn-primary">Létrehozás</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>Kategóriák listája</h2>
+                <table class="table">
+                    <thead>
+                        <tr><th>#</th><th>Név</th><th>Leírás</th><th>Státusz</th></tr>
+                    </thead>
+                    <tbody id="categoryTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ KOSÁR ============ -->
+    <section id="tab-cart" class="view">
+        <div class="card">
+            <div class="toolbar">
+                <h2>Kosár tartalma</h2>
+                <button class="btn btn-danger" id="cartClearBtn">Kosár ürítése</button>
+                <button class="btn btn-ghost" id="cartRefreshBtn">Frissítés</button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr><th>Termék</th><th>Egységár</th><th>Mennyiség</th><th>Részösszeg</th><th></th></tr>
+                </thead>
+                <tbody id="cartTable"></tbody>
+            </table>
+            <div class="cart-total" id="cartTotal">Összesen: —</div>
+            <p class="muted">A rendelés leadásához használd a <b>Rendelések</b> fület.</p>
+        </div>
+    </section>
+
+    <!-- ============ RENDELÉSEK ============ -->
+    <section id="tab-orders" class="view">
+        <div class="card">
+            <h2>Rendelés leadása</h2>
+            <form id="orderForm" class="grid-4">
+                <label>Szállítási cím
+                    <input type="text" name="shippingAddress" placeholder="Fő utca 1.">
+                </label>
+                <label>Város
+                    <input type="text" name="shippingCity" placeholder="Budapest">
+                </label>
+                <label>Megye
+                    <input type="text" name="shippingState" placeholder="Pest">
+                </label>
+                <label>Irányítószám
+                    <input type="text" name="shippingZipCode" placeholder="1011">
+                </label>
+                <label class="span-4">Megjegyzés
+                    <input type="text" name="notes">
+                </label>
+                <button type="submit" class="btn btn-primary">Rendelés leadása</button>
+            </form>
+        </div>
+        <div class="card">
+            <div class="toolbar">
+                <h2>Rendeléseim</h2>
+                <button class="btn btn-ghost" id="ordersRefreshBtn">Frissítés</button>
+            </div>
+            <div id="ordersList"></div>
+        </div>
+    </section>
+
+    <!-- ============ FIZETÉS ============ -->
+    <section id="tab-payment" class="view">
+        <div class="grid-2">
+            <div class="card">
+                <h2>Fizetés</h2>
+                <label>Rendelés azonosító
+                    <div class="toolbar">
+                        <input id="paymentOrderId" class="input" type="number" min="1" placeholder="pl. 1" value="1">
+                        <button class="btn btn-ghost" id="paymentLoadBtn">Rendelés betöltése</button>
+                    </div>
+                </label>
+                <div class="pre-box" id="paymentOrderInfo">Tölts be egy rendelést a fizetéshez.</div>
+                <form id="paymentForm" class="mt">
+                    <label>Kártyaszám
+                        <input type="text" name="cardNumber" value="4242 4242 4242 4242" required>
+                    </label>
+                    <label>Kártyatulajdonos
+                        <input type="text" name="cardHolder" value="ANNA KOVACS" required>
+                    </label>
+                    <div class="grid-2">
+                        <label>Lejárat
+                            <input type="text" name="expiryDate" value="12/28" required>
+                        </label>
+                        <label>CVV
+                            <input type="text" name="cvv" value="123" required>
+                        </label>
+                    </div>
+                    <label>Összeg (Ft)
+                        <input type="number" name="amount" step="0.01" required>
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-block">Fizetés indítása</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>Fizetési eredmény</h2>
+                <pre id="paymentResult" class="pre-box">Még nem történt fizetés.</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ ÉRTESÍTÉSEK ============ -->
+    <section id="tab-notifications" class="view">
+        <div class="card">
+            <h2>Értesítés küldése</h2>
+            <label>Üzenet
+                <textarea id="notificationMessage" rows="4" placeholder='pl. {"type":"ORDER_CONFIRMED","email":"demo1@shop.hu","message":"A rendelésed úton van!"}'></textarea>
+            </label>
+            <button class="btn btn-primary" id="notificationSendBtn">Küldés</button>
+            <pre id="notificationResult" class="pre-box mt">—</pre>
+        </div>
+    </section>
+
+</main>
+
+<!-- ============ API LOG PANEL ============ -->
+<div class="api-log" id="apiLog">
+    <div class="api-log-header">
+        <span>API hívások naplója</span>
+        <div>
+            <button class="btn btn-ghost btn-sm" id="apiLogClear">Törlés</button>
+            <button class="btn btn-ghost btn-sm" id="apiLogToggle">Összecsukás</button>
+        </div>
+    </div>
+    <div class="api-log-body" id="apiLogBody">
+        <p class="muted">Még nem történt API hívás.</p>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

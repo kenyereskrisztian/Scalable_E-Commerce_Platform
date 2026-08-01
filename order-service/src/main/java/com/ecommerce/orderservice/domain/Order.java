@@ -55,6 +55,7 @@ public class Order {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
+    @ToString.Exclude
     private List<OrderItem> orderItems = new ArrayList<>();
 
     @PrePersist

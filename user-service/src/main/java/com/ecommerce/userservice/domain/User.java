@@ -3,6 +3,7 @@ package com.ecommerce.userservice.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class User {
 
     @NotBlank
     @Column(nullable = false)
+    @JsonIgnore
     private String password;
 
     @NotBlank

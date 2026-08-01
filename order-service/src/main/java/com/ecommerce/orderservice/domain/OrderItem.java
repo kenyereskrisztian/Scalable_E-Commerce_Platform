@@ -2,6 +2,7 @@ package com.ecommerce.orderservice.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Order order;
 
     @Column(name = "product_id", nullable = false)

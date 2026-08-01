@@ -1,6 +1,7 @@
 package com.ecommerce.orderservice.client;
 
 import com.ecommerce.common.dto.CartItemDTO;
+import com.ecommerce.common.security.RequestTokenUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,21 +17,26 @@ public class CartServiceClient {
         this.webClient = WebClient.create("http://localhost:8083");
     }
 
+    private WebClient.RequestHeadersSpec<?> withToken(WebClient.RequestHeadersSpec<?> spec) {
+        String token = RequestTokenUtils.getBearerToken();
+        return token != null ? spec.header("Authorization", token) : spec;
+    }
+
     public List<CartItemDTO> getCart(Long userId) {
-        return webClient.get()
+        return withToken(webClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/api/cart")
                         .queryParam("userId", userId)
-                        .build())
+                        .build()))
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<CartItemDTO>>() {})
                 .block();
     }
 
     public void clearCart(Long userId) {
-        webClient.delete()
+        withToken(webClient.delete()
                 .uri(uriBuilder -> uriBuilder.path("/api/cart/clear")
                         .queryParam("userId", userId)
-                        .build())
+                        .build()))
                 .retrieve()
                 .toBodilessEntity()
                 .block();

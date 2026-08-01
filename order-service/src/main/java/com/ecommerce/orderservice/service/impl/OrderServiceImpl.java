@@ -75,6 +75,7 @@ public class OrderServiceImpl implements OrderService {
                     .build();
 
             orderItemRepository.save(orderItem);
+            savedOrder.getOrderItems().add(orderItem);
         }
 
         savedOrder.setTotalAmount(totalAmount);

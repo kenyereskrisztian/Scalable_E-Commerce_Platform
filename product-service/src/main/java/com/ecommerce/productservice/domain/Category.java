@@ -1,5 +1,6 @@
 package com.ecommerce.productservice.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -43,6 +44,8 @@ public class Category {
 
     @OneToMany(mappedBy = "category")
     @Builder.Default
+    @ToString.Exclude
+    @JsonIgnore
     private List<Product> products = new ArrayList<>();
 
     @PrePersist

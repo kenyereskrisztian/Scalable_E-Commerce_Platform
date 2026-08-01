@@ -1,6 +1,7 @@
 package com.ecommerce.paymentservice.client;
 
 import com.ecommerce.common.dto.OrderDTO;
+import com.ecommerce.common.security.RequestTokenUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -14,9 +15,13 @@ public class OrderServiceClient {
     }
 
     public OrderDTO getOrder(Long id) {
-        return webClient.get()
-                .uri("/api/orders/{id}", id)
-                .retrieve()
+        WebClient.RequestHeadersSpec<?> spec = webClient.get()
+                .uri("/api/orders/{id}", id);
+        String token = RequestTokenUtils.getBearerToken();
+        if (token != null) {
+            spec = spec.header("Authorization", token);
+        }
+        return spec.retrieve()
                 .bodyToMono(OrderDTO.class)
                 .block();
     }
