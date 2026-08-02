@@ -10,8 +10,8 @@ public class ProductServiceClient {
 
     private final WebClient webClient;
 
-    public ProductServiceClient() {
-        this.webClient = WebClient.create("http://localhost:8082");
+    public ProductServiceClient(WebClient.Builder builder) {
+        this.webClient = builder.baseUrl("http://product-service").build();
     }
 
     public ProductDTO getProduct(Long id) {

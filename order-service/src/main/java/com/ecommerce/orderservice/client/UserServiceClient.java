@@ -10,8 +10,8 @@ public class UserServiceClient {
 
     private final WebClient webClient;
 
-    public UserServiceClient() {
-        this.webClient = WebClient.create("http://localhost:8081");
+    public UserServiceClient(WebClient.Builder builder) {
+        this.webClient = builder.baseUrl("http://user-service").build();
     }
 
     public UserDTO getUser(Long id) {

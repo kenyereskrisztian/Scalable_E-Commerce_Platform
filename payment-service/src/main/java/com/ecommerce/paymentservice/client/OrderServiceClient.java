@@ -10,8 +10,8 @@ public class OrderServiceClient {
 
     private final WebClient webClient;
 
-    public OrderServiceClient() {
-        this.webClient = WebClient.create("http://localhost:8084");
+    public OrderServiceClient(WebClient.Builder builder) {
+        this.webClient = builder.baseUrl("http://order-service").build();
     }
 
     public OrderDTO getOrder(Long id) {

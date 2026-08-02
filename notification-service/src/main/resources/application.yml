@@ -8,3 +8,11 @@ app:
     expiration: 86400000
 server:
   port: 8086
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registry-fetch-interval-seconds: 5
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

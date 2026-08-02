@@ -2,16 +2,18 @@
 
 /* ============================================================
    E-Commerce Platform — tesztfelület
-   Szolgáltatások base URL-jei (a gateway bevezetése után ide
-   elég a http://localhost:8080-ra váltani mindet).
+   Minden API-hívás egyetlen belépési ponton (API Gateway) megy
+   át. Éles környezetben itt váltasz a nyilvános gateway URL-re.
    ============================================================ */
-const API = {
-    user:         'http://localhost:8081',
-    product:      'http://localhost:8082',
-    cart:         'http://localhost:8083',
-    order:        'http://localhost:8084',
-    payment:      'http://localhost:8085',
-    notification: 'http://localhost:8086',
+const API_BASE = 'http://localhost:8080';
+
+const SERVICE_PROBES = {
+    user:         '/api/users',
+    product:      '/api/categories',
+    cart:         '/api/cart',
+    order:        '/api/orders',
+    payment:      '/api/payments',
+    notification: '/api/notifications',
 };
 
 const AUTH_KEY = 'ec_auth';
@@ -81,6 +83,7 @@ async function api(base, path, { method = 'GET', body, params, auth = true } = {
             method,
             headers,
             body: body !== undefined ? JSON.stringify(body) : undefined,
+            cache: 'no-store',
         });
     } catch {
         logCall(method, url, null, 'HÁLÓZATI HIBA — a szolgáltatás nem érhető el');
@@ -128,25 +131,27 @@ function requireAuth() {
 }
 
 async function pingServices() {
+    if (document.hidden) return;
     const session = getAuth();
-    for (const [svc, base] of Object.entries(API)) {
+    for (const [svc, path] of Object.entries(SERVICE_PROBES)) {
         const dot = document.querySelector(`.status-dot[data-svc="${svc}"]`);
+        if (dot.classList.contains('checking')) continue;
         dot.classList.remove('up', 'down');
         dot.classList.add('checking');
         dot.title = 'Ellenőrzés...';
         const ctrl = new AbortController();
-        const timer = setTimeout(() => ctrl.abort(), 2500);
+        const timer = setTimeout(() => ctrl.abort(), 7000);
         try {
             const headers = {};
             if (session?.token) headers['Authorization'] = 'Bearer ' + session.token;
-            const res = await fetch(base + '/', { method: 'GET', headers, signal: ctrl.signal });
+            const res = await fetch(API_BASE + path, { method: 'GET', headers, signal: ctrl.signal });
             dot.classList.remove('checking');
             dot.classList.add('up');
-            dot.title = `${base} — fut (HTTP ${res.status})`;
+            dot.title = `${API_BASE}${path} — fut (HTTP ${res.status})`;
         } catch {
             dot.classList.remove('checking');
             dot.classList.add('down');
-            dot.title = `${base} — nem fut`;
+            dot.title = `${API_BASE}${path} — nem fut`;
         } finally {
             clearTimeout(timer);
         }
@@ -172,7 +177,7 @@ $('loginForm').addEventListener('submit', async e => {
     e.preventDefault();
     const f = e.target;
     try {
-        const data = await api(API.user, '/api/auth/login', {
+        const data = await api(API_BASE, '/api/auth/login', {
             method: 'POST',
             body: {
                 email: f.email.value.trim(),
@@ -195,7 +200,7 @@ $('registerForm').addEventListener('submit', async e => {
     e.preventDefault();
     const f = e.target;
     try {
-        const data = await api(API.user, '/api/auth/register', {
+        const data = await api(API_BASE, '/api/auth/register', {
             method: 'POST',
             body: {
                 email: f.email.value.trim(),
@@ -232,7 +237,7 @@ let categoriesCache = [];
 
 async function loadCategories(fillSelect = false) {
     try {
-        const cats = await api(API.product, '/api/categories');
+        const cats = await api(API_BASE, '/api/categories');
         categoriesCache = cats;
 
         const select = $('productCategoryFilter');
@@ -258,7 +263,7 @@ $('categoryForm').addEventListener('submit', async e => {
     const f = e.target;
     if (!requireAuth()) return;
     try {
-        await api(API.product, '/api/categories', {
+        await api(API_BASE, '/api/categories', {
             method: 'POST',
             body: {
                 name: f.name.value.trim(),
@@ -286,7 +291,7 @@ async function loadProducts() {
     if (catId) params.categoryId = catId;
     else if (name) params.name = name;
     try {
-        const products = await api(API.product, '/api/products', { params });
+        const products = await api(API_BASE, '/api/products', { params });
         renderProducts(asArray(products, 'GET /api/products'));
     } catch (err) {
         toast(err.message, 'err');
@@ -352,7 +357,7 @@ function renderProducts(products) {
 
 async function addToCart(userId, productId, quantity) {
     try {
-        await api(API.cart, '/api/cart/add', {
+        await api(API_BASE, '/api/cart/add', {
             method: 'POST',
             params: { userId, productId, quantity },
         });
@@ -370,8 +375,8 @@ async function loadCart() {
     if (!session) return;
     try {
         const [items, products] = await Promise.all([
-            api(API.cart, '/api/cart', { params: { userId: session.userId } }),
-            api(API.product, '/api/products'),
+            api(API_BASE, '/api/cart', { params: { userId: session.userId } }),
+            api(API_BASE, '/api/products'),
         ]);
         const byId = Object.fromEntries(products.map(p => [p.id, p]));
         renderCart(items, byId);
@@ -418,10 +423,10 @@ function renderCart(items, byId) {
 
 async function updateQty(cartItemId, delta) {
     try {
-        const items = await api(API.cart, '/api/cart', { params: { userId: getAuth().userId } });
+        const items = await api(API_BASE, '/api/cart', { params: { userId: getAuth().userId } });
         const it = items.find(x => x.id == cartItemId);
         const qty = Math.max(1, (it?.quantity ?? 1) + delta);
-        await api(API.cart, `/api/cart/${cartItemId}`, { method: 'PUT', params: { quantity: qty } });
+        await api(API_BASE, `/api/cart/${cartItemId}`, { method: 'PUT', params: { quantity: qty } });
         loadCart();
     } catch (err) {
         toast(err.message, 'err');
@@ -430,7 +435,7 @@ async function updateQty(cartItemId, delta) {
 
 async function removeCartItem(cartItemId) {
     try {
-        await api(API.cart, `/api/cart/${cartItemId}`, { method: 'DELETE' });
+        await api(API_BASE, `/api/cart/${cartItemId}`, { method: 'DELETE' });
         toast('Tétel törölve a kosárból.');
         loadCart();
     } catch (err) {
@@ -442,7 +447,7 @@ $('cartClearBtn').addEventListener('click', async () => {
     const session = requireAuth();
     if (!session) return;
     try {
-        await api(API.cart, '/api/cart/clear', { method: 'DELETE', params: { userId: session.userId } });
+        await api(API_BASE, '/api/cart/clear', { method: 'DELETE', params: { userId: session.userId } });
         toast('A kosár kiürítve.');
         loadCart();
     } catch (err) {
@@ -460,7 +465,7 @@ $('orderForm').addEventListener('submit', async e => {
     if (!session) return;
     const f = e.target;
     try {
-        await api(API.order, '/api/orders', {
+        await api(API_BASE, '/api/orders', {
             method: 'POST',
             params: { userId: session.userId },
             body: {
@@ -485,8 +490,8 @@ async function loadOrders() {
     if (!session) return;
     try {
         const [orders, products] = await Promise.all([
-            api(API.order, '/api/orders', { params: { userId: session.userId } }),
-            api(API.product, '/api/products'),
+            api(API_BASE, '/api/orders', { params: { userId: session.userId } }),
+            api(API_BASE, '/api/products'),
         ]);
         const byId = Object.fromEntries(products.map(p => [p.id, p]));
         renderOrders(orders, byId);
@@ -539,7 +544,7 @@ function renderOrders(orders, byId) {
 async function updateStatus(orderId) {
     const select = document.querySelector(`[data-order-status="${orderId}"]`);
     try {
-        await api(API.order, `/api/orders/${orderId}/status`, {
+        await api(API_BASE, `/api/orders/${orderId}/status`, {
             method: 'PATCH',
             params: { status: select.value },
         });
@@ -559,7 +564,7 @@ $('paymentLoadBtn').addEventListener('click', async () => {
     const orderId = $('paymentOrderId').value.trim();
     if (!orderId) return toast('Add meg a rendelés azonosítóját!', 'err');
     try {
-        const order = await api(API.order, `/api/orders/${orderId}`);
+        const order = await api(API_BASE, `/api/orders/${orderId}`);
         $('paymentOrderInfo').textContent = JSON.stringify(order, null, 2);
         $('paymentForm').amount.value = order.totalAmount;
         toast('Rendelés betöltve.');
@@ -576,7 +581,7 @@ $('paymentForm').addEventListener('submit', async e => {
     const orderId = $('paymentOrderId').value.trim();
     if (!orderId) return toast('Add meg a rendelés azonosítóját!', 'err');
     try {
-        const result = await api(API.payment, `/api/payments/${orderId}`, {
+        const result = await api(API_BASE, `/api/payments/${orderId}`, {
             method: 'POST',
             body: {
                 cardNumber: f.cardNumber.value.trim(),
@@ -600,7 +605,7 @@ $('notificationSendBtn').addEventListener('click', async () => {
     const message = $('notificationMessage').value.trim();
     if (!message) return toast('Írj egy üzenetet!', 'err');
     try {
-        const result = await api(API.notification, '/api/notifications/send', {
+        const result = await api(API_BASE, '/api/notifications/send', {
             method: 'POST',
             body: message,
         });
@@ -628,3 +633,4 @@ $('apiLogToggle').addEventListener('click', () => {
 updateUserChip();
 pingServices();
 setInterval(pingServices, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pingServices(); });

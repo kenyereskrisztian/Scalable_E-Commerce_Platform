@@ -13,8 +13,8 @@ public class CartServiceClient {
 
     private final WebClient webClient;
 
-    public CartServiceClient() {
-        this.webClient = WebClient.create("http://localhost:8083");
+    public CartServiceClient(WebClient.Builder builder) {
+        this.webClient = builder.baseUrl("http://cart-service").build();
     }
 
     private WebClient.RequestHeadersSpec<?> withToken(WebClient.RequestHeadersSpec<?> spec) {

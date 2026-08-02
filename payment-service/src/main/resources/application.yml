@@ -9,3 +9,11 @@ app:
   jwt:
     secret: "NOvxdE/9L4Mn4dKRSzIcGNnHjf3gdtdTopmti0n7Dy4="
     expiration: 86400000
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registry-fetch-interval-seconds: 5
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
