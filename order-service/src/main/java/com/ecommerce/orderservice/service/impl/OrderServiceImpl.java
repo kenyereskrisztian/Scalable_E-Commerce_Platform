@@ -51,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
                 .shippingState(request.getShippingState())
                 .shippingZipCode(request.getShippingZipCode())
                 .notes(request.getNotes())
+                .totalAmount(totalAmount)
                 .build();
 
         Order savedOrder = orderRepository.save(order);

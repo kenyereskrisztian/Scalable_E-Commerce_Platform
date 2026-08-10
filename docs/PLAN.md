@@ -38,12 +38,12 @@ Monolit szétbontása független Maven modulokra.
 ## Phase 3 — Infrastruktúra (Discovery + Gateway)
 Service discovery és API gateway a rendszer elé.
 
-- [ ] 3.1 `discovery-service` — Eureka Server (port: 8761)
-- [ ] 3.2 Minden service Eureka Client + `@EnableDiscoveryClient`
-- [ ] 3.3 `api-gateway` — Spring Cloud Gateway (port: 8080)
-- [ ] 3.4 Gateway route-ok (/api/users/** → user-service, stb.)
-- [ ] 3.5 Gateway szintű JWT validation (centralizált auth)
-- [ ] 3.6 Service discovery-s névre áttérés szolgáltatások között
+- [X] 3.1 `discovery-service` — Eureka Server (port: 8761)
+- [X] 3.2 Minden service Eureka Client + `@EnableDiscoveryClient` (a 2023.0.x-ben a client dependency automatikusan regisztrál, `@EnableDiscoveryClient` nem kell)
+- [X] 3.3 `api-gateway` — Spring Cloud Gateway (port: 8080)
+- [X] 3.4 Gateway route-ok (/api/users/** → user-service, stb.)
+- [X] 3.5 Gateway szintű JWT validation (centralizált auth)
+- [X] 3.6 Service discovery-s névre áttérés szolgáltatások között (cart/order/payment WebClient `http://<service-name>`)
 
 **Eredmény:** Egyetlen endpoint (localhost:8080), Gateway-en keresztül.
 

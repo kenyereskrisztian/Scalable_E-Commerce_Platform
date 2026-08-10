@@ -38,3 +38,8 @@ target/
 # OS
 .DS_Store
 Thumbs.db
+
+# Helyi telepítőcsomagok (WSL/Windows)
+*.deb
+*.exe
+*.msi

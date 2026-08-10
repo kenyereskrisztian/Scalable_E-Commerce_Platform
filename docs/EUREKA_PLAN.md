@@ -2,6 +2,12 @@
 
 A `spring-cloud.version` property fix kész (pom.xml:35). Ebből a tervből lehet dolgozni.
 
+> **ÁLLAPOT (2026-08):** a terv minden lépése kész és be van építve. A 3.6-ot (név alapú
+> hívások) a `cart-service`, `order-service` és `payment-service` WebClient-kliensei már
+> használják (`http://<service-name>`, `@LoadBalanced` builder). Az `api-gateway` is
+> regisztrál a Eureka-ba és `lb://` route-okkal továbbít. Ellenőrzés: `scripts/start-all.bat`,
+> Eureka dashboard: http://localhost:8761.
+
 ## Felépítés
 
 ```
