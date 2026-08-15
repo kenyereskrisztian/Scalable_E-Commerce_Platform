@@ -4,6 +4,8 @@
 -- Idempotens: újrafuttatható, a tesztadatokat mindig visszaállítja.
 -- ============================================================
 
+SET NAMES utf8mb4;
+
 -- 1) Adatbázisok létrehozása (a service-ek JPA-ja a táblákat a ddl-auto: update-tel hozná létre,
 --    itt kézzel tükrözzük, hogy service-indítás nélkül is működjön)
 CREATE DATABASE IF NOT EXISTS ecommerce_users    CHARACTER SET utf8mb4 COLLATE utf8mb4_hungarian_ci;

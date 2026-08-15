@@ -52,10 +52,10 @@ Service discovery és API gateway a rendszer elé.
 ## Phase 4 — Docker + DevOps
 Konténerizáció és lokális infrastruktúra.
 
-- [ ] 4.1 Dockerfile minden service-hez (multi-stage build)
-- [ ] 4.2 `docker-compose.yml` — MySQL + minden service + Eureka
+- [x] 4.1 Dockerfile minden service-hez (multi-stage build)
+- [x] 4.2 `docker-compose.yml` — MySQL + minden service + Eureka
 - [ ] 4.3 `docker-compose.override.yml` dev profilhoz (hot reload)
-- [ ] 4.4 `.env` fájl környezeti változóknak
+- [x] 4.4 `.env` fájl környezeti változóknak
 
 **Eredmény:** `docker-compose up --build` → teljes rendszer fut.
 

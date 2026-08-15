@@ -1,0 +1,144 @@
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./scripts/seed.sql:/docker-entrypoint-initdb.d/seed.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ptest1234"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  discovery-service:
+    build:
+      context: .
+      dockerfile: discovery-service/Dockerfile
+    ports:
+      - "8761:8761"
+
+  user-service:
+    build:
+      context: .
+      dockerfile: user-service/Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      DB_NAME: ecommerce_users
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+  product-service:
+    build:
+      context: .
+      dockerfile: product-service/Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      DB_NAME: ecommerce_products
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: cart-service/Dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      DB_NAME: ecommerce_cart
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    ports:
+      - "8084:8084"
+    depends_on:
+      db:
+        condition: service_healthy
+      discovery-service:
+        condition: service_started
+    environment:
+      MYSQL_HOST: db
+      MYSQL_PORT: 3306
+      DB_NAME: ecommerce_orders
+      MYSQL_USER: root
+      MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    ports:
+      - "8085:8085"
+    depends_on:
+      discovery-service:
+        condition: service_started
+    environment:
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    ports:
+      - "8086:8086"
+    depends_on:
+      discovery-service:
+        condition: service_started
+    environment:
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      discovery-service:
+        condition: service_started
+    environment:
+      EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
+      JWT_SECRET: ${JWT_SECRET}
+
+volumes:
+  mysql-data:
