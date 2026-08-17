@@ -62,8 +62,8 @@ Konténerizáció és lokális infrastruktúra.
 ---
 
 ## Phase 5 — Monitoring + Centralized Logging
-- [ ] 5.1 `spring-boot-starter-actuator` minden service-ben
-- [ ] 5.2 Prometheus + Grafana docker-compose-ba
+- [x] 5.1 `spring-boot-starter-actuator` minden service-ben
+- [x] 5.2 Prometheus + Grafana docker-compose-ba
 - [ ] 5.3 ELK Stack (Elasticsearch, Logstash, Kibana)
 - [ ] 5.4 Health check + metrics endpointok
 
