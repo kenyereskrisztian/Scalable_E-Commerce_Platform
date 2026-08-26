@@ -54,7 +54,7 @@ Konténerizáció és lokális infrastruktúra.
 
 - [x] 4.1 Dockerfile minden service-hez (multi-stage build)
 - [x] 4.2 `docker-compose.yml` — MySQL + minden service + Eureka
-- [ ] 4.3 `docker-compose.override.yml` dev profilhoz (hot reload)
+- [x] 4.3 `docker-compose.dev.yml` dev profilhoz (hot reload)
 - [x] 4.4 `.env` fájl környezeti változóknak
 
 **Eredmény:** `docker-compose up --build` → teljes rendszer fut.
