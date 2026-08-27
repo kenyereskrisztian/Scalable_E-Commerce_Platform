@@ -40,6 +40,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      LOGSTASH_URL: logstash:5000
 
   product-service:
     build:
@@ -60,6 +61,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      LOGSTASH_URL: logstash:5000
 
   cart-service:
     build:
@@ -100,6 +102,7 @@ services:
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      LOGSTASH_URL: logstash:5000
 
   payment-service:
     build:
@@ -113,6 +116,7 @@ services:
     environment:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      LOGSTASH_URL: logstash:5000
 
   notification-service:
     build:
@@ -126,6 +130,7 @@ services:
     environment:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      LOGSTASH_URL: logstash:5000
 
   api-gateway:
     build:
@@ -172,5 +177,38 @@ services:
       - prometheus
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.13.4
+    volumes:
+      - ./scripts/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+    environment:
+      - LS_JAVA_OPTS=-Xms512m -Xmx512m
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5000:5000"
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.4
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
+
 volumes:
   mysql-data:
+  es-data:
