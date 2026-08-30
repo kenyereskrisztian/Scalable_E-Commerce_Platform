@@ -65,11 +65,11 @@ Konténerizáció és lokális infrastruktúra.
 - [x] 5.1 `spring-boot-starter-actuator` minden service-ben
 - [x] 5.2 Prometheus + Grafana docker-compose-ba
 - [x] 5.3 ELK Stack (Elasticsearch, Logstash, Kibana)
-- [ ] 5.4 Health check + metrics endpointok
+- [x] 5.4 Health check + metrics endpointok
 
 ---
 
 ## Phase 6 — CI/CD Pipeline
-- [ ] 6.1 GitHub Actions: build + test PR-nként
+- [x] 6.1 GitHub Actions: build + test PR-nként (CI + smoke/context tesztek minden microservice-ben)
 - [ ] 6.2 Docker image build + push registry-be
 - [ ] 6.3 Deploy script (Docker Swarm vagy Kubernetes manifestek)

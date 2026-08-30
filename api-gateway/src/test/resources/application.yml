@@ -1,0 +1,14 @@
+spring:
+  cloud:
+    discovery:
+      enabled: false
+
+app:
+  jwt:
+    secret: NOvxdE/9L4Mn4dKRSzIcGNnHjf3gdtdTopmti0n7Dy4=
+    expiration: 86400000
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
