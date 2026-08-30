@@ -14,18 +14,14 @@ services:
       timeout: 5s
       retries: 20
   frontend-service:
-    build:
-      context: .
-      dockerfile: frontend-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/frontend-service:latest
     ports:
       - "5500:5500"
     depends_on:
       api-gateway:
         condition: service_started
   discovery-service:
-    build:
-      context: .
-      dockerfile: discovery-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/discovery-service:latest
     ports:
       - "8761:8761"
     healthcheck:
@@ -36,9 +32,7 @@ services:
       start_period: 30s
 
   user-service:
-    build:
-      context: .
-      dockerfile: user-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/user-service:latest
     ports:
       - "8081:8081"
     depends_on:
@@ -63,9 +57,7 @@ services:
       LOGSTASH_URL: logstash:5000
 
   product-service:
-    build:
-      context: .
-      dockerfile: product-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/product-service:latest
     ports:
       - "8082:8082"
     depends_on:
@@ -90,9 +82,7 @@ services:
       LOGSTASH_URL: logstash:5000
 
   cart-service:
-    build:
-      context: .
-      dockerfile: cart-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/cart-service:latest
     ports:
       - "8083:8083"
     depends_on:
@@ -116,9 +106,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
 
   order-service:
-    build:
-      context: .
-      dockerfile: order-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/order-service:latest
     ports:
       - "8084:8084"
     depends_on:
@@ -143,9 +131,7 @@ services:
       LOGSTASH_URL: logstash:5000
 
   payment-service:
-    build:
-      context: .
-      dockerfile: payment-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/payment-service:latest
     ports:
       - "8085:8085"
     depends_on:
@@ -163,9 +149,7 @@ services:
       LOGSTASH_URL: logstash:5000
 
   notification-service:
-    build:
-      context: .
-      dockerfile: notification-service/Dockerfile
+    image: ghcr.io/kenyereskrisztian/notification-service:latest
     ports:
       - "8086:8086"
     depends_on:
@@ -183,9 +167,7 @@ services:
       LOGSTASH_URL: logstash:5000
 
   api-gateway:
-    build:
-      context: .
-      dockerfile: api-gateway/Dockerfile
+    image: ghcr.io/kenyereskrisztian/api-gateway:latest
     ports:
       - "8080:8080"
     depends_on:
