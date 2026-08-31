@@ -71,5 +71,16 @@ Konténerizáció és lokális infrastruktúra.
 
 ## Phase 6 — CI/CD Pipeline
 - [x] 6.1 GitHub Actions: build + test PR-nként (CI + smoke/context tesztek minden microservice-ben)
-- [ ] 6.2 Docker image build + push registry-be
-- [ ] 6.3 Deploy script (Docker Swarm vagy Kubernetes manifestek)
+- [x] 6.2 Docker image build + push GHCR-be (9 image, privát, `latest` + `git-sha`; `docker-compose.yml` a GHCR image-ekre váltva; `docs/VM-futtatas.md` — másik gépen Dockerrel történő futtatás)
+- [ ] 6.3 Deploy script (Kubernetes manifest-készlet + dokumentáció — manifestek csak, nincs éles deploy)
+
+### 6.3 terv (megvalósítás a következő lépésben)
+- [ ] `k8s/00-namespace.yaml` — `ecommerce` névtér
+- [ ] `k8s/01-configmap.yaml` — nem-titkos beállítások (MYSQL_HOST/PORT/USER, DB_NAME, EUREKA_DEFAULT_ZONE, LOGSTASH_URL)
+- [ ] `k8s/02-secret.yaml` — JWT_SECRET + MYSQL_ROOT_PASSWORD (placeholder, a futtató tölti ki)
+- [ ] `k8s/03-mysql.yaml` — MySQL Deployment + Service + PVC + InitContainer a seed.sql-hez
+- [ ] `k8s/04-imagepullsecret.yaml` — GHCR privát image-hez (regcred placeholder)
+- [ ] `k8s/<service>/` — Deployment + Service a 9 service-re (discovery, gateway, user, product, cart, order, payment, notification, frontend) + readiness/liveness probe
+- [ ] `k8s/ingress.yaml` — frontend (5500) + gateway (8080) külső elérés
+- [ ] `docs/Kubernetes-deploy.md` — manifestek használata, Secret/ConfigMap kitöltés, kubectl parancsok
+- [ ] YAML-validáció minden manifesten

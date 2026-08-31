@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: product-service-configmap
+  namespace: ecommerce
+data:
+  MYSQL_HOST: "mysql"
+  MYSQL_PORT: "3306"
+  MYSQL_USER: "root"
+  DB_NAME: "ecommerce_products"
+  EUREKA_DEFAULT_ZONE: "http://discovery-service:8761/eureka/"
+  LOGSTASH_URL: "logstash:5000"

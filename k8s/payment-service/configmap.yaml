@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payment-service-configmap
+  namespace: ecommerce
+data:
+  EUREKA_DEFAULT_ZONE: "http://discovery-service:8761/eureka/"
+  LOGSTASH_URL: "logstash:5000"

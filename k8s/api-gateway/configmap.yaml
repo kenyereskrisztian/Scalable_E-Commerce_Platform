@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-configmap
+  namespace: ecommerce
+data:
+  EUREKA_DEFAULT_ZONE: "http://discovery-service:8761/eureka/"
