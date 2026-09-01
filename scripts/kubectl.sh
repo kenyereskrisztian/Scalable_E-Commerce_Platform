@@ -13,8 +13,9 @@ fi
 SERVICES=(api-gateway cart-service discovery-service frontend-service notification-service order-service payment-service product-service user-service)
 
 if [ "$CLEAN" -eq 1 ]; then
-  echo ">>> Meglevo deploymentek torlese: ${SERVICES[*]}"
+  echo ">>> Meglevo deploymentek es HPA-k torlese"
   kubectl delete deployment "${SERVICES[@]}" -n "$NS" --ignore-not-found=true
+  kubectl delete hpa "${SERVICES[@]/%/-hpa}" -n "$NS" --ignore-not-found=true
 fi
 
 echo ">>> (1) Namespace"
@@ -29,6 +30,10 @@ for svc in discovery-service user-service product-service cart-service order-ser
   kubectl apply -R -f "k8s/$svc/"
   kubectl rollout status deployment/"$svc" -n "$NS" --timeout=300s || echo "!! WARN: $svc rollout nem fejezodott be 300s alatt"
 done
+
+echo
+echo ">>> HPA-k ellenorzese:"
+kubectl get hpa -n "$NS"
 
 echo
 echo ">>> KESZ - deploymentek allapota:"

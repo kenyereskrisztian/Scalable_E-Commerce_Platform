@@ -72,15 +72,14 @@ Konténerizáció és lokális infrastruktúra.
 ## Phase 6 — CI/CD Pipeline
 - [x] 6.1 GitHub Actions: build + test PR-nként (CI + smoke/context tesztek minden microservice-ben)
 - [x] 6.2 Docker image build + push GHCR-be (9 image, privát, `latest` + `git-sha`; `docker-compose.yml` a GHCR image-ekre váltva; `docs/VM-futtatas.md` — másik gépen Dockerrel történő futtatás)
-- [ ] 6.3 Deploy script (Kubernetes manifest-készlet + dokumentáció — manifestek csak, nincs éles deploy)
+- [x] 6.3 Deploy script (Kubernetes manifest-készlet + dokumentáció — manifestek csak, nincs éles deploy)
 
-### 6.3 terv (megvalósítás a következő lépésben)
-- [ ] `k8s/00-namespace.yaml` — `ecommerce` névtér
-- [ ] `k8s/01-configmap.yaml` — nem-titkos beállítások (MYSQL_HOST/PORT/USER, DB_NAME, EUREKA_DEFAULT_ZONE, LOGSTASH_URL)
-- [ ] `k8s/02-secret.yaml` — JWT_SECRET + MYSQL_ROOT_PASSWORD (placeholder, a futtató tölti ki)
-- [ ] `k8s/03-mysql.yaml` — MySQL Deployment + Service + PVC + InitContainer a seed.sql-hez
-- [ ] `k8s/04-imagepullsecret.yaml` — GHCR privát image-hez (regcred placeholder)
-- [ ] `k8s/<service>/` — Deployment + Service a 9 service-re (discovery, gateway, user, product, cart, order, payment, notification, frontend) + readiness/liveness probe
-- [ ] `k8s/ingress.yaml` — frontend (5500) + gateway (8080) külső elérés
-- [ ] `docs/Kubernetes-deploy.md` — manifestek használata, Secret/ConfigMap kitöltés, kubectl parancsok
-- [ ] YAML-validáció minden manifesten
+### 6.3 terv (megvalósítva, eltérésekkel)
+- [x] `k8s/00-namespace.yaml` — `ecommerce` névtér
+- [x] Service-enkénti ConfigMapek — nem-titkos beállítások (`<service>-configmap`: MYSQL_HOST/PORT/USER, DB_NAME, EUREKA_DEFAULT_ZONE, LOGSTASH_URL); a tervezett központi `01-configmap.yaml` helyett service-enkénti, ahogy a session során kialakítottuk
+- [x] Secretek — **nem** manifest, hanem kézzel létrehozott `ecommerce-shared-secret` (MYSQL_PASSWORD + JWT_SECRET) és `ghcr-secret` (docker-registry); a `02-secret.yaml`/`04-imagepullsecret.yaml` tervétől eltérve a deployok ezekre hivatkoznak
+- [x] `k8s/03-mysql.yaml` — MySQL Deployment + Service + PVC + ConfigMap (seed.sql) az initdb-hez
+- [x] `k8s/<service>/` — Deployment + Service + startupProbe + readiness/liveness probe a 8 service-re + frontend
+- [x] `k8s/frontend-service/ingress.yaml` — frontend (5500) külső elérés (`frontend.local`); a többi API külön ingress nélkül, a gateway-en keresztül
+- [x] `docs/Kubernetes-deploy.md` — manifestek használata, Secret/ConfigMap kitöltés, kubectl parancsok, ismert buktatók
+- [x] YAML-validáció minden manifesten (rapp munka közben)
