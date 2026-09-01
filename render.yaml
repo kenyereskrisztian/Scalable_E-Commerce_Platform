@@ -1,0 +1,252 @@
+previews:
+  generation: off
+
+envVarGroups:
+  - name: ecommerce-secrets
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+
+services:
+  # ---------------------------------------------------------------
+  # Adatbázis (Renderen nincs managelt MySQL -> saját privát service
+  # + persistens disk; a seed.sql-t a mysql/Dockerfile veti be)
+  # ---------------------------------------------------------------
+  - type: pserv
+    runtime: docker
+    name: mysql
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: mysql/Dockerfile
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 1
+    envVars:
+      - fromGroup: ecommerce-secrets
+
+  # ---------------------------------------------------------------
+  # Service discovery (Eureka szerver)
+  # ---------------------------------------------------------------
+  - type: pserv
+    runtime: docker
+    name: discovery-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: discovery-service/Dockerfile
+
+  # ---------------------------------------------------------------
+  # Publikus belépési pont (Spring Cloud Gateway)
+  # ---------------------------------------------------------------
+  - type: web
+    runtime: docker
+    name: api-gateway
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    healthCheckPath: /actuator/health
+    dockerfilePath: api-gateway/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  # ---------------------------------------------------------------
+  # Mikroszolgáltatások (privát hálózaton, adatbázissal)
+  # ---------------------------------------------------------------
+  - type: pserv
+    runtime: docker
+    name: user-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: user-service/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: MYSQL_HOST
+        fromService:
+          name: mysql
+          type: pserv
+          property: host
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
+        value: root
+      - key: MYSQL_PASSWORD
+        fromService:
+          name: mysql
+          type: pserv
+          envVarKey: MYSQL_ROOT_PASSWORD
+      - key: DB_NAME
+        value: ecommerce_users
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  - type: pserv
+    runtime: docker
+    name: product-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: product-service/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: MYSQL_HOST
+        fromService:
+          name: mysql
+          type: pserv
+          property: host
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
+        value: root
+      - key: MYSQL_PASSWORD
+        fromService:
+          name: mysql
+          type: pserv
+          envVarKey: MYSQL_ROOT_PASSWORD
+      - key: DB_NAME
+        value: ecommerce_products
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  - type: pserv
+    runtime: docker
+    name: cart-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: cart-service/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: MYSQL_HOST
+        fromService:
+          name: mysql
+          type: pserv
+          property: host
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
+        value: root
+      - key: MYSQL_PASSWORD
+        fromService:
+          name: mysql
+          type: pserv
+          envVarKey: MYSQL_ROOT_PASSWORD
+      - key: DB_NAME
+        value: ecommerce_cart
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  - type: pserv
+    runtime: docker
+    name: order-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: order-service/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: MYSQL_HOST
+        fromService:
+          name: mysql
+          type: pserv
+          property: host
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
+        value: root
+      - key: MYSQL_PASSWORD
+        fromService:
+          name: mysql
+          type: pserv
+          envVarKey: MYSQL_ROOT_PASSWORD
+      - key: DB_NAME
+        value: ecommerce_orders
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  # ---------------------------------------------------------------
+  # Mikroszolgáltatások adatbázis nélkül
+  # ---------------------------------------------------------------
+  - type: pserv
+    runtime: docker
+    name: payment-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: payment-service/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  - type: pserv
+    runtime: docker
+    name: notification-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    dockerfilePath: notification-service/Dockerfile
+    envVars:
+      - fromGroup: ecommerce-secrets
+      - key: EUREKA_HOST
+        fromService:
+          name: discovery-service
+          type: pserv
+          property: host
+      - key: EUREKA_PORT
+        value: "8761"
+
+  # ---------------------------------------------------------------
+  # Publikus frontend; az API_BASE_URL a gateway publikus URL-je
+  # (a Browsert a gateway közvetlen üti -> CORS engedélyezett)
+  # ---------------------------------------------------------------
+  - type: web
+    runtime: docker
+    name: frontend-service
+    region: frankfurt
+    branch: main
+    plan: 0.5c-512mb
+    healthCheckPath: /actuator/health
+    dockerfilePath: frontend-service/Dockerfile
+    envVars:
+      - key: API_BASE_URL
+        fromService:
+          name: api-gateway
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL

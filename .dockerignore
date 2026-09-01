@@ -4,3 +4,4 @@
 *.deb
 docs
 scripts
+!scripts/seed.sql

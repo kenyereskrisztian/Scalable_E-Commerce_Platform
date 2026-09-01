@@ -5,7 +5,7 @@
    Minden API-hívás egyetlen belépési ponton (API Gateway) megy
    át. Éles környezetben itt váltasz a nyilvános gateway URL-re.
    ============================================================ */
-const API_BASE = 'http://localhost:8080';
+const API_BASE = window.API_BASE || 'http://localhost:8080';
 
 const SERVICE_PROBES = {
     user:         '/api/users',
