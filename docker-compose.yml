@@ -4,37 +4,42 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./scripts/seed.sql:/docker-entrypoint-initdb.d/seed.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-ptest1234"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p\"$$MYSQL_ROOT_PASSWORD\""]
       interval: 10s
       timeout: 5s
       retries: 20
+    restart: unless-stopped
   frontend-service:
     image: ghcr.io/kenyereskrisztian/frontend-service:latest
     ports:
       - "5500:5500"
+    environment:
+      API_BASE_URL: http://${PUBLIC_IP:-localhost}:8080
     depends_on:
       api-gateway:
         condition: service_started
+    restart: unless-stopped
   discovery-service:
     image: ghcr.io/kenyereskrisztian/discovery-service:latest
     ports:
-      - "8761:8761"
+      - "127.0.0.1:8761:8761"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
       interval: 30s
       timeout: 5s
       retries: 3
       start_period: 30s
+    restart: unless-stopped
 
   user-service:
     image: ghcr.io/kenyereskrisztian/user-service:latest
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     depends_on:
       db:
         condition: service_healthy
@@ -55,11 +60,12 @@ services:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
       LOGSTASH_URL: logstash:5000
+    restart: unless-stopped
 
   product-service:
     image: ghcr.io/kenyereskrisztian/product-service:latest
     ports:
-      - "8082:8082"
+      - "127.0.0.1:8082:8082"
     depends_on:
       db:
         condition: service_healthy
@@ -80,11 +86,12 @@ services:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
       LOGSTASH_URL: logstash:5000
+    restart: unless-stopped
 
   cart-service:
     image: ghcr.io/kenyereskrisztian/cart-service:latest
     ports:
-      - "8083:8083"
+      - "127.0.0.1:8083:8083"
     depends_on:
       db:
         condition: service_healthy
@@ -104,11 +111,12 @@ services:
       MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD:-test1234}
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+    restart: unless-stopped
 
   order-service:
     image: ghcr.io/kenyereskrisztian/order-service:latest
     ports:
-      - "8084:8084"
+      - "127.0.0.1:8084:8084"
     depends_on:
       db:
         condition: service_healthy
@@ -129,11 +137,12 @@ services:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
       LOGSTASH_URL: logstash:5000
+    restart: unless-stopped
 
   payment-service:
     image: ghcr.io/kenyereskrisztian/payment-service:latest
     ports:
-      - "8085:8085"
+      - "127.0.0.1:8085:8085"
     depends_on:
       discovery-service:
         condition: service_started
@@ -147,11 +156,12 @@ services:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
       LOGSTASH_URL: logstash:5000
+    restart: unless-stopped
 
   notification-service:
     image: ghcr.io/kenyereskrisztian/notification-service:latest
     ports:
-      - "8086:8086"
+      - "127.0.0.1:8086:8086"
     depends_on:
       discovery-service:
         condition: service_started
@@ -165,6 +175,7 @@ services:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
       LOGSTASH_URL: logstash:5000
+    restart: unless-stopped
 
   api-gateway:
     image: ghcr.io/kenyereskrisztian/api-gateway:latest
@@ -182,19 +193,21 @@ services:
     environment:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+    restart: unless-stopped
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./scripts/prometheus.yml:/etc/prometheus/prometheus.yml
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    restart: unless-stopped
 
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
@@ -202,6 +215,7 @@ services:
       - prometheus
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    restart: unless-stopped
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
@@ -210,9 +224,10 @@ services:
       - xpack.security.enabled=false
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
     ports:
-      - "9200:9200"
+      - "127.0.0.1:9200:9200"
     volumes:
       - es-data:/usr/share/elasticsearch/data
+    restart: unless-stopped
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.13.4
@@ -223,7 +238,8 @@ services:
     depends_on:
       - elasticsearch
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
+    restart: unless-stopped
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.4
@@ -232,7 +248,8 @@ services:
     depends_on:
       - elasticsearch
     ports:
-      - "5601:5601"
+      - "127.0.0.1:5601:5601"
+    restart: unless-stopped
 
 volumes:
   mysql-data:
