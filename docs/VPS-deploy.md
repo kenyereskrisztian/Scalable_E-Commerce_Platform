@@ -100,9 +100,26 @@ ssh -i ~/.ssh/oracle_key -L 8761:localhost:8761 -L 3000:localhost:3000 -L 5601:l
 # ezek után helyben:  http://localhost:8761, :3000, :5601
 ```
 
+## ELK / monitoring — ami NEM indul automatikusan
+
+**Fontos: az ELK-stack (elasticsearch, logstash, kibana) a `profiles: ["elk"]` mögött van, ezért a `docker compose up -d` NEM indítja el őket.** Ha nem kell a loggyűjtés, ez így is marad — a `prometheus` és a `grafana` viszont mindig fut.
+
+Ezeket manuálisan kell elindítani, ha kellenek:
+
+```bash
+cd /opt/ecommerce && sudo docker compose --profile elk up -d
+```
+
+Ha az ELK nincs fent, a service-ek logstash-appendere csendben, async újrapróbálkozik — nem blokkol, de a `docker logs`-ban WARN üzenetek jelenhetnek meg. Az ELK leállításához:
+
+```bash
+cd /opt/ecommerce && sudo docker compose --profile elk stop
+```
+
+Indítás/kikapcsolás után a ["Ellenőrzés"](#ellenőrzés) szakaszbeli `ps`-sel ellenőrizd, hogy mit futtatsz.
+
 ## Megjegyzések
 
 - A `.env` tartalmazza a `MYSQL_ROOT_PASSWORD`-t és a `JWT_SECRET`-et — fontos: minden futó JWT a `JWT_SECRET`-tel fut, ha megváltoztatod, minden token érvénytelenné válik.
-- Az ELK-stack (elasticsearch/logstash/kibana) erőforrás-éhes, ezért **alapból nem indul** — a `profiles: ["elk"]` mögött van. Ha kell a loggyűjtés, kapcsold be: `docker compose --profile elk up -d`. A `prometheus`/`grafana` mindig fut (könnyűek). Ha az ELK nincs fent, a service-ek logstash-appendere csendben újrapróbálkozik (async, nem blokkol).
-- A MySQL seed csak **egyszer** fut (üres volumen esetén). Adatvesztés nélküli újrascemeléhez: `docker compose down -v` (⚠️ törli az adatot).
+- A MySQL seed csak **egyszer** fut (üres volumen esetén). Adatvesztés nélküli újrascemeléshez: `docker compose down -v` (⚠️ törli az adatot).
 - Saját domain + HTTPS: tedd egy Caddy/Nginx proxy mögé (a 80/443 már nyitva van az ufw-ban).
