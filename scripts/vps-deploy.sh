@@ -88,7 +88,7 @@ cd "$APP_DIR"
 info "=== 4/6 – .env konfiguráció ==="
 if [ ! -f .env ]; then
   MYSQL_PW=$(generate_secret)
-  JWT=$(generate_secret)
+  JWT=$(openssl rand -base64 48)
 
   # Automatikus PUBLIC_IP lekérés
   PUBLIC_IP=$(curl -s --max-time 5 https://api.ipify.org || curl -s --max-time 5 https://ifconfig.me || echo "ENTER_YOUR_PUBLIC_IP")
@@ -123,13 +123,13 @@ info "=== 6/6 – Stack indítása ==="
 docker compose pull
 docker compose up -d
 
-info "Várakozás a healthcheck-ekre (akár 2 perc)..."
+info "Várakozás a healthcheck-ekre (akár 5 perc – lassú ARM VM)..."
 ATTEMPTS=0
-MAX_WAIT=120
+MAX_WAIT=300
 until [ "$(docker inspect --format='{{.State.Health.Status}}' $(docker compose ps -q api-gateway) 2>/dev/null)" = "healthy" ]; do
   ATTEMPTS=$((ATTEMPTS + 1))
   [ "$ATTEMPTS" -ge "$MAX_WAIT" ] && die "api-gateway nem lett egészséges $MAX_WAIT mp alatt"
-  sleep 2
+  sleep 1
 done
 ok "api-gateway healthy"
 

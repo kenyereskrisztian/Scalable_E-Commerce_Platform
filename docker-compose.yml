@@ -33,7 +33,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     restart: unless-stopped
 
   user-service:
@@ -50,7 +50,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       MYSQL_HOST: db
       MYSQL_PORT: 3306
@@ -76,7 +76,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       MYSQL_HOST: db
       MYSQL_PORT: 3306
@@ -102,7 +102,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       MYSQL_HOST: db
       MYSQL_PORT: 3306
@@ -127,7 +127,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       MYSQL_HOST: db
       MYSQL_PORT: 3306
@@ -151,7 +151,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
@@ -170,7 +170,7 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
@@ -189,10 +189,11 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 90s
     environment:
       EUREKA_DEFAULT_ZONE: http://discovery-service:8761/eureka/
       JWT_SECRET: ${JWT_SECRET}
+      LOGSTASH_URL: logstash:5000
     restart: unless-stopped
   prometheus:
     image: prom/prometheus:latest
@@ -219,6 +220,7 @@ services:
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    profiles: ["elk"]
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -231,6 +233,7 @@ services:
 
   logstash:
     image: docker.elastic.co/logstash/logstash:8.13.4
+    profiles: ["elk"]
     volumes:
       - ./scripts/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
     environment:
@@ -243,6 +246,7 @@ services:
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.4
+    profiles: ["elk"]
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     depends_on:

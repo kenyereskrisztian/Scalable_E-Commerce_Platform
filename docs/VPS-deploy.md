@@ -103,6 +103,6 @@ ssh -i ~/.ssh/oracle_key -L 8761:localhost:8761 -L 3000:localhost:3000 -L 5601:l
 ## Megjegyzések
 
 - A `.env` tartalmazza a `MYSQL_ROOT_PASSWORD`-t és a `JWT_SECRET`-et — fontos: minden futó JWT a `JWT_SECRET`-tel fut, ha megváltoztatod, minden token érvénytelenné válik.
-- Az ELK-stack (elasticsearch/logstash/kibana) elég erőforrás-éhes — egy 2 OCPU-s ARM-en lassú lehet. Ha nem kell, vágd ki a `docker-compose.yml` megfelelő blokkjait (prometheus/grafana maradhatna).
+- Az ELK-stack (elasticsearch/logstash/kibana) erőforrás-éhes, ezért **alapból nem indul** — a `profiles: ["elk"]` mögött van. Ha kell a loggyűjtés, kapcsold be: `docker compose --profile elk up -d`. A `prometheus`/`grafana` mindig fut (könnyűek). Ha az ELK nincs fent, a service-ek logstash-appendere csendben újrapróbálkozik (async, nem blokkol).
 - A MySQL seed csak **egyszer** fut (üres volumen esetén). Adatvesztés nélküli újrascemeléhez: `docker compose down -v` (⚠️ törli az adatot).
 - Saját domain + HTTPS: tedd egy Caddy/Nginx proxy mögé (a 80/443 már nyitva van az ufw-ban).
