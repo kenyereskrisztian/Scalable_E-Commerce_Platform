@@ -2,6 +2,7 @@
 set -euo pipefail
 
 export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+kubectl() { command k3s kubectl "$@"; }
 
 cd "$(dirname "$0")/.."
 

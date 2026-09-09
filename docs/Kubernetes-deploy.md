@@ -76,8 +76,9 @@ kubectl create secret generic ecommerce-shared-secret \
   → 5 perc indítási türelem. A Spring/Eureka service-ek 60–90 mp alatt indulnak; enélkül a
   liveness probe megöli őket crash-loopban.
 - **readiness/liveness** a megfelelő porton (`/actuator/health`).
-- **resource-keret:** requests 256Mi/250m, limits 512Mi/500m. (Kötelező a CPU-alapú HPA-hoz —
-  a frontend is kapott request/limit keretet.)
+- **resource-keret:** requests 256Mi/100m, limits 512Mi/500m. (Kötelező a CPU-alapú HPA-hoz —
+  a frontend is kapott request/limit keretet. A 100m request szándékos: 2 OCPU-s node-on így fér el
+  mind a 11 pod; a limit 500m marad a burst kapacitásnak.)
 - **imagePullSecrets:** `ghcr-secret` minden service-nél.
 - **envFrom:** `<service>-configmap` + `ecommerce-shared-secret`.
 
