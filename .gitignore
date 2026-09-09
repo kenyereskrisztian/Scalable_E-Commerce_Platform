@@ -44,3 +44,4 @@ Thumbs.db
 *.exe
 *.msi
 .env
+.node_modules/*

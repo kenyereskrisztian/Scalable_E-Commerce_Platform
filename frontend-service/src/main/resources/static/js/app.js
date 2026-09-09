@@ -110,14 +110,19 @@ async function api(base, path, { method = 'GET', body, params, auth = true } = {
 function updateUserChip() {
     const session = getAuth();
     const chip = $('userChip');
-    const logout = $('logoutBtn');
     if (session?.token) {
-        chip.innerHTML = `<span class="chip-user"><b>${esc(session.firstName)} ${esc(session.lastName)}</b> &nbsp;(${esc(session.email)}, ID: ${session.userId ?? '?'})</span>`;
-        logout.classList.remove('hidden');
+        chip.innerHTML = `<span class="chip-user"><b>${esc(session.firstName)} ${esc(session.lastName)}</b> &nbsp;(${esc(session.email)}, ID: ${session.userId ?? '?'})</span><button class="btn btn-ghost btn-sm" id="logoutBtn">Kijelentkezés</button>`;
     } else {
         chip.innerHTML = '<span class="chip-guest">Nincs bejelentkezve</span>';
-        logout.classList.add('hidden');
     }
+    $('logoutBtn').addEventListener('click', () => {
+        clearAuth();
+        updateUserChip();
+        $('authInfo').textContent = 'Kijelentkeztél.';
+        toast('Kijelentkezve.');
+        pingServices();
+        switchTab('auth');
+    });
 }
 
 function requireAuth() {
@@ -219,15 +224,6 @@ $('registerForm').addEventListener('submit', async e => {
     } catch (err) {
         toast(err.message, 'err');
     }
-});
-
-$('logoutBtn').addEventListener('click', () => {
-    clearAuth();
-    updateUserChip();
-    $('authInfo').textContent = 'Kijelentkeztél.';
-    toast('Kijelentkezve.');
-    pingServices();
-    switchTab('auth');
 });
 
 /* ============================================================
