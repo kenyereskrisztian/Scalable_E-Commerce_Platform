@@ -19,7 +19,7 @@ services:
     ports:
       - "5500:5500"
     environment:
-      API_BASE_URL: http://${PUBLIC_IP:-localhost}:8080
+      API_BASE_URL: https://kkrisztian-ecommerce.duckdns.org
     depends_on:
       api-gateway:
         condition: service_started

@@ -115,7 +115,9 @@ function updateUserChip() {
     } else {
         chip.innerHTML = '<span class="chip-guest">Nincs bejelentkezve</span>';
     }
-    $('logoutBtn').addEventListener('click', () => {
+    const logoutBtn = $('logoutBtn');
+    if (!logoutBtn) return;
+    logoutBtn.addEventListener('click', () => {
         clearAuth();
         updateUserChip();
         $('authInfo').textContent = 'Kijelentkeztél.';
