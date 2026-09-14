@@ -118,8 +118,89 @@ cd /opt/ecommerce && sudo docker compose --profile elk stop
 
 Indítás/kikapcsolás után a ["Ellenőrzés"](#ellenőrzés) szakaszbeli `ps`-sel ellenőrizd, hogy mit futtatsz.
 
+## HTTPS / saját domain (certbot + DuckDNS + nginx)
+
+A platform a **`https://kkrisztian-ecommerce.duckdns.org`** címen érhető el. A Docker-stack ettől függetlenül fut; az nginx reverse proxy a kéréseket a frontendre és a gateway-re továbbítja.
+
+### Architektúra
+
+```
+https://kkrisztian-ecommerce.duckdns.org
+        │  (DuckDNS A-rekord → PUBLIC_IP)
+        ▼
+     nginx :443 (Let's Encrypt tanúsítvány)
+     ├── /      → 127.0.0.1:5500   (frontend-service)
+     └── /api/  → 127.0.0.1:8080   (api-gateway)
+```
+
+- A frontend `API_BASE_URL`-ja a compose-ban a domainre mutat (`https://kkrisztian-ecommerce.duckdns.org`), így **same-origin** a hívás — nincs CORS- és mixed content-probléma.
+- A `:80` HTTP-kérés 301-gyel átirányul `https://`-re.
+
+### Nginx config (`/etc/nginx/sites-available/…`)
+
+```nginx
+server {
+    listen 80;
+    server_name kkrisztian-ecommerce.duckdns.org;
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name kkrisztian-ecommerce.duckdns.org;
+
+    ssl_certificate     /etc/letsencrypt/live/kkrisztian-ecommerce.duckdns.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/kkrisztian-ecommerce.duckdns.org/privkey.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+
+    location / {
+        proxy_pass http://127.0.0.1:5500;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:8080;   # záró / NÉLKÜL, hogy az /api/ út megmaradjon
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Config betöltése:
+
+```bash
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+> **Figyelem:** a `/api/` blokkban a `proxy_pass` végén **ne** legyen záró `/` (`proxy_pass http://127.0.0.1:8080;`). Záró `/`-tel az nginx levágja az `/api/` prefixet, és a gateway `404`-et ad.
+
+### Certbot — tanúsítvány kiadása és MEGÚJÍTÁSA
+
+A tanúsítványt **manuális DNS-challenge**-szel adjuk ki (DuckDNS-nél ez nem automatikus):
+
+```bash
+sudo certbot certonly --manual --preferred-challenges dns -d kkrisztian-ecommerce.duckdns.org
+```
+
+**⚠️ Fontos: a tanúsítvány 90 napig él, és a `--manual` mód miatt NINCS automatikus megújítás.** A példány újraindítása nem számít bele — a certbot kéri le újra, ha lejárt.
+
+Megújítás (90 naponként, kézzel):
+
+```bash
+sudo certbot certonly --manual --preferred-challenges dns -d kkrisztian-ecommerce.duckdns.org --force-renewal
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+A megújítás során a certbot egy `_acme-challenge.kkrisztian-ecommerce` TXT-rekord felvételét kéri a DuckDNS felületén; a parancs megmondja a pontos értéket.
+
 ## Megjegyzések
 
 - A `.env` tartalmazza a `MYSQL_ROOT_PASSWORD`-t és a `JWT_SECRET`-et — fontos: minden futó JWT a `JWT_SECRET`-tel fut, ha megváltoztatod, minden token érvénytelenné válik.
 - A MySQL seed csak **egyszer** fut (üres volumen esetén). Adatvesztés nélküli újrascemeléshez: `docker compose down -v` (⚠️ törli az adatot).
-- Saját domain + HTTPS: tedd egy Caddy/Nginx proxy mögé (a 80/443 már nyitva van az ufw-ban).
